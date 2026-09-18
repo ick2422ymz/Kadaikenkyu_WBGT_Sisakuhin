@@ -75,8 +75,3 @@ humSlider.addEventListener('input', updateSimulator);
 
 // 5. ページを読み込んだ直後にも1回実行し、初期状態をセットする
 updateSimulator();
-```eof
-
-**【JavaScriptの解説】**
-*   `calculateWBGT`: Arduino（C++）やPythonで作成した数式と全く同じロジックをJavaScriptの記述（`Math.pow` など）に翻訳したものです。
-*   `ledGreen.classList.add('on')`: これがArduinoの `digitalWrite(greenPin, HIGH)` に相当します。HTMLの要素に `on` というクラスを付けることで、CSSで設定した「光るエフェクト」が適用されます。逆に `classList.remove('on')` で消灯（LOW）します。
