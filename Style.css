@@ -173,10 +173,3 @@ input[type=range]::-webkit-slider-thumb {
 .led.yellow.on { background-color: #f1c40f; box-shadow: 0 0 15px #f1c40f, inset 0 0 5px white; border-color: #f39c12; }
 .led.red.on { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c, inset 0 0 5px white; border-color: #c0392b; }
 /* ==================================== */
-```eof
-
-**【CSSの解説】**
-*   `input[type=range]::-webkit-slider-thumb`: ここで、標準の丸いスライダーのつまみを、計測器のような金属風の四角いつまみ（グラデーションや影を使用）に変更しています。
-*   `.led.on`: HTMLのLEDの枠に対し、JavaScriptから `on` という目印（クラス）が付けられたときにだけ、明るい色と光が漏れるような影（`box-shadow`）を適用して、LEDが点灯しているように見せています。
-
----
