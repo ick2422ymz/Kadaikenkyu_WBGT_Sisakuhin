@@ -3,49 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WBGT 計測器シミュレーター</title>
-    <!-- CSSファイルを読み込む設定 -->
-    <link rel="stylesheet" href="style.css">
-    <!-- Google Fontsからデジタル時計風のフォントを読み込み -->
+    <title>WBGT 計測器 (PDF風)</title>
+    <!-- デジタル時計風のフォントを読み込み -->
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-</head>
+    </head>
+
 <body>
     <div class="device-container">
-        <!-- ヘッダー部分 -->
+        
+        <div class="page-number">[Page 1]</div>
+
         <header class="device-header">
-            <h1>WBGT MONITOR v1.0</h1>
-            <div class="status-indicator"></div>
+            <h1>WBGT計</h1>
         </header>
 
         <div class="device-body">
-            <!-- センサー入力エリア（つまみ） -->
+            <!-- 左側：入力パネル -->
             <div class="input-panel">
-                <h2>SENSOR INPUTS</h2>
                 
+                <!-- 温度コントロール -->
                 <div class="control-group">
-                    <label>温度 (TEMP) <span id="temp-display" class="digital-text">25.0</span> ℃</label>
-                    <!-- スライダー。Tinkercadの可変抵抗や温度センサーの代わり -->
-                    <input type="range" id="temp-slider" min="10.0" max="40.0" step="0.1" value="25.0">
+                    <label>温度 <span id="temp-display" class="digital-text">25.0</span> 度</label>
+                    <div class="button-group">
+                        <button onclick="changeTemp(-10)">10度↓</button>
+                        <button onclick="changeTemp(-1)">1度↓</button>
+                        <button onclick="changeTemp(-0.1)">0.1度↓</button>
+                        <button onclick="changeTemp(0.1)">0.1度↑</button>
+                        <button onclick="changeTemp(1)">1度↑</button>
+                        <button onclick="changeTemp(10)">10度↑</button>
+                    </div>
                 </div>
 
+                <!-- 湿度コントロール -->
                 <div class="control-group">
-                    <label>湿度 (HUM) <span id="hum-display" class="digital-text">50</span> %</label>
-                    <input type="range" id="hum-slider" min="20" max="90" step="1" value="50">
+                    <label>湿度 <span id="hum-display" class="digital-text">50.0</span> %</label>
+                    <div class="button-group">
+                        <button onclick="changeHum(-10)">10%↓</button>
+                        <button onclick="changeHum(-1)">1%↓</button>
+                        <button onclick="changeHum(-0.1)">0.1%↓</button>
+                        <button onclick="changeHum(0.1)">0.1%↑</button>
+                        <button onclick="changeHum(1)">1%↑</button>
+                        <button onclick="changeHum(10)">10%↑</button>
+                    </div>
                 </div>
             </div>
 
-            <!-- 出力エリア（ディスプレイとLED） -->
+            <!-- 右側：出力パネル -->
             <div class="output-panel">
-                <!-- WBGT値の表示ディスプレイ -->
+                
                 <div class="display-screen">
-                    <div class="display-label">CALCULATED WBGT</div>
+                    <div class="display-label">WBGT値</div>
                     <div id="wbgt-display" class="digital-text large-display">--.-</div>
-                    <div class="unit">℃ (室内目安)</div>
+                    <div class="unit">○○度</div>
                 </div>
 
-                <!-- 警告レベルLED（TinkercadのLEDの代わり） -->
                 <div class="alert-system">
-                    <div id="status-text" class="status-message">WAITING...</div>
+                    <div id="status-text" class="status-message">慢心せずに暑さに気をつけて</div>
+                    
                     <div class="led-array">
                         <div id="led-green" class="led green"></div>
                         <div id="led-yellow" class="led yellow"></div>
@@ -55,7 +69,5 @@
             </div>
         </div>
     </div>
-    <!-- JavaScriptファイルを読み込む設定（通常はHTMLの最後） -->
-    <script src="script.js"></script>
-</body>
+    </body>
 </html>
