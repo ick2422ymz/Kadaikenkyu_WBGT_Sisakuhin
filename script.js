@@ -1,65 +1,85 @@
-// 1. HTML内にある各部品（要素）を探して、JavaScriptから操作できるように変数に格納します
-const tempSlider = document.getElementById('temp-slider');
-const humSlider = document.getElementById('hum-slider');
-const tempDisplay = document.getElementById('temp-display');
-const humDisplay = document.getElementById('hum-display');
-const wbgtDisplay = document.getElementById('wbgt-display');
-const statusText = document.getElementById('status-text');
+ <script>
+        // HTML内の各要素を取得
+        const tempDisplay = document.getElementById('temp-display');
+        const humDisplay = document.getElementById('hum-display');
+        const wbgtDisplay = document.getElementById('wbgt-display');
+        const statusText = document.getElementById('status-text');
+        const ledGreen = document.getElementById('led-green');
+        const ledYellow = document.getElementById('led-yellow');
+        const ledRed = document.getElementById('led-red');
 
-const ledGreen = document.getElementById('led-green');
-const ledYellow = document.getElementById('led-yellow');
-const ledRed = document.getElementById('led-red');
+        // 現在の数値を保存する変数（初期値）
+        let currentTemp = 25.0;
+        let currentHum = 50.0;
 
-// 2. WBGTを計算する関数
-function calculateWBGT(T, RH) {
-    const term1 = T * Math.atan(0.151977 * Math.pow(RH + 8.313659, 0.5));
-    const term2 = Math.atan(T + RH);
-    const term3 = - Math.atan(RH - 1.676331);
-    const term4 = 0.00391838 * Math.pow(RH, 1.5) * Math.atan(0.023101 * RH);
-    const term5 = - 4.686035;
-    
-    const Tw = term1 + term2 + term3 + term4 + term5;
-    const WBGT = 0.7 * Tw + 0.3 * T;
-    
-    return Math.round(WBGT * 10) / 10;
-}
+        // WBGTを計算する関数 (Stullの近似式)
+        function calculateWBGT(T, RH) {
+            const term1 = T * Math.atan(0.151977 * Math.pow(RH + 8.313659, 0.5));
+            const term2 = Math.atan(T + RH);
+            const term3 = - Math.atan(RH - 1.676331);
+            const term4 = 0.00391838 * Math.pow(RH, 1.5) * Math.atan(0.023101 * RH);
+            const term5 = - 4.686035;
+            
+            const Tw = term1 + term2 + term3 + term4 + term5;
+            const WBGT = 0.7 * Tw + 0.3 * T;
+            
+            // 小数点第1位で四捨五入
+            return Math.round(WBGT * 10) / 10;
+        }
 
-// 3. スライダーが動かされたときに実行されるメインプログラム
-function updateSimulator() {
-    const T = parseFloat(tempSlider.value);
-    const RH = parseFloat(humSlider.value);
+        // 画面の表示と判定を更新するメイン処理
+        function updateSimulator() {
+            // 安全装置: 異常な数値にならないように制限
+            if (currentTemp > 60) currentTemp = 60;
+            if (currentTemp < -20) currentTemp = -20;
+            if (currentHum > 100) currentHum = 100;
+            if (currentHum < 0) currentHum = 0;
 
-    tempDisplay.innerText = T.toFixed(1);
-    humDisplay.innerText = RH;
+            // 画面の温度・湿度表示を更新
+            tempDisplay.innerText = currentTemp.toFixed(1);
+            humDisplay.innerText = currentHum.toFixed(1);
+            
+            // WBGTを計算して表示
+            const wbgt = calculateWBGT(currentTemp, currentHum);
+            wbgtDisplay.innerText = wbgt.toFixed(1);
+            
+            // LEDをすべて消灯
+            ledGreen.classList.remove('on');
+            ledYellow.classList.remove('on');
+            ledRed.classList.remove('on');
+            
+            // WBGT値に基づいた判定とLEDの点灯
+            if (wbgt < 21.0) {
+                ledGreen.classList.add('on');
+                statusText.innerText = "ほぼ安全";
+                statusText.style.color = "#27ae60"; 
+            } else if (wbgt < 28.0) {
+                ledYellow.classList.add('on');
+                statusText.innerText = "注意";
+                statusText.style.color = "#f39c12"; 
+            } else {
+                ledRed.classList.add('on');
+                statusText.innerText = "慢心せずに暑さに気をつけて";
+                statusText.style.color = "#c0392b"; 
+            }
+        }
 
-    const wbgt = calculateWBGT(T, RH);
-    wbgtDisplay.innerText = wbgt.toFixed(1);
+        // 温度ボタンが押されたときの処理
+        function changeTemp(amount) {
+            currentTemp += amount;
+            // 小数点の計算誤差を防ぐ処理
+            currentTemp = Math.round(currentTemp * 10) / 10;
+            updateSimulator(); 
+        }
 
-    ledGreen.classList.remove('on');
-    ledYellow.classList.remove('on');
-    ledRed.classList.remove('on');
+        // 湿度ボタンが押されたときの処理
+        function changeHum(amount) {
+            currentHum += amount;
+            // 小数点の計算誤差を防ぐ処理
+            currentHum = Math.round(currentHum * 10) / 10;
+            updateSimulator(); 
+        }
 
-    if (wbgt < 21.0) {
-        ledGreen.classList.add('on');
-        statusText.innerText = "SAFE (安全)";
-        statusText.style.color = "#2ecc71";
-        wbgtDisplay.style.color = "#2ecc71";
-    } else if (wbgt < 28.0) {
-        ledYellow.classList.add('on');
-        statusText.innerText = "CAUTION (注意)";
-        statusText.style.color = "#f1c40f";
-        wbgtDisplay.style.color = "#f1c40f";
-    } else {
-        ledRed.classList.add('on');
-        statusText.innerText = "WARNING (警戒)";
-        statusText.style.color = "#e74c3c";
-        wbgtDisplay.style.color = "#e74c3c";
-    }
-}
-
-// 4. スライダーが動かされるたびに updateSimulator 関数を自動的に実行するよう設定
-tempSlider.addEventListener('input', updateSimulator);
-humSlider.addEventListener('input', updateSimulator);
-
-// 5. ページを読み込んだ直後にも1回実行し、初期状態をセットする
-updateSimulator();
+        // ページ読み込み時に初期状態を表示
+        updateSimulator();
+    </script>
