@@ -1,174 +1,294 @@
-<style>
-        /* 基本設定：白・グレー基調のPDF風デザイン */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f0f2f5; 
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #333333; 
-        }
+/* STREAMING_CHUNK: 外部フォントの読み込みとカラー変数の定義... */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
-        .digital-text {
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 2px;
-        }
+:root {
+/* PDFビューア風の背景色（暗いグレー） */
+--app-bg: #525659;
 
-        /* 計測器本体のケース */
-        .device-container {
-            background-color: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 8px;
-            padding: 40px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 800px;
-            max-width: 95%;
-        }
+/* A4用紙の色 */
+--paper-bg: #ffffff;
 
-        /* ページ番号のスタイル */
-        .page-number {
-            font-size: 14px;
-            color: #666666;
-            margin-bottom: 10px;
-        }
+/* インクの色（真っ黒ではなく、少し柔らかい黒） */
+--ink-main: #222222;
+--ink-light: #555555;
+--ink-border: #333333;
 
-        /* ヘッダー部分 */
-        .device-header {
-            border-bottom: 2px solid #333333;
-            padding-bottom: 15px;
-            margin-bottom: 25px;
-        }
+/* 液晶ディスプレイの色 */
+--lcd-bg: #c4d0c3;
+--lcd-text: #1a2e1f;
 
-        .device-header h1 {
-            margin: 0;
-            font-size: 32px;
-            color: #000000;
-            letter-spacing: 2px;
-        }
+/* LEDの色 */
+--led-off: #e0e0e0;
+--led-green: #22c55e;
+--led-yellow: #eab308;
+--led-red: #ef4444;
 
-        .device-body {
-            display: flex;
-            gap: 30px;
-        }
 
-        /* 入力・出力パネルの共通設定 */
-        .input-panel, .output-panel {
-            flex: 1;
-            background-color: #fafafa;
-            border: 1px solid #eeeeee;
-            padding: 20px;
-            border-radius: 10px;
-        }
+}
 
-        .control-group {
-            margin-bottom: 30px;
-        }
+/* STREAMING_CHUNK: 全体のリセットとbodyのレイアウト設定... */
 
-        .control-group label {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            font-weight: bold;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
+{
+box-sizing: border-box;
+margin: 0;
+padding: 0;
+}
 
-        /* ボタン群のレイアウト */
-        .button-group {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
+body {
+background-color: var(--app-bg);
+display: flex;
+justify-content: center;
+/* 上下に余白を持たせて、用紙が浮いているように見せる */
+padding: 40px 20px;
+font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
+}
 
-        .button-group button {
-            background-color: #ffffff;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-            padding: 10px 5px;
-            font-size: 14px;
-            color: #333333;
-            cursor: pointer;
-            transition: background-color 0.1s;
-        }
+/* STREAMING_CHUNK: A4ドキュメント本体のデザイン... /
+/ A4ドキュメント（紙）本体のスタイル /
+.device-container {
+background-color: var(--paper-bg);
+width: 100%;
+/ A4サイズのピクセル換算（96dpi）に近い値 /
+max-width: 794px;
+min-height: 1123px;
+/ 実際の紙のような余白（20ミリ） /
+padding: 20mm;
+/ PDFビューア特有のドロップシャドウ */
+box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+position: relative;
+color: var(--ink-main);
+background-image: linear-gradient(to bottom right, #ffffff, #fcfcfc);
+}
 
-        .button-group button:hover {
-            background-color: #e2e8f0;
-        }
-        
-        .button-group button:active {
-            background-color: #cbd5e1;
-        }
+/* ページ番号（右上の管理番号風） */
+.page-number {
+position: absolute;
+top: 15mm;
+right: 20mm;
+font-family: monospace;
+font-size: 14px;
+color: var(--ink-light);
+border-bottom: 1px solid var(--ink-light);
+padding-bottom: 2px;
+}
 
-        /* ディスプレイ画面の設定 */
-        .display-screen {
-            background-color: #ffffff;
-            border: 2px solid #333333;
-            border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 30px;
-            position: relative;
-        }
+/* STREAMING_CHUNK: ヘッダーと見出しのスタイル設定... /
+/ ドキュメントのタイトル */
+.device-header {
+border-bottom: 3px double var(--ink-border);
+padding-bottom: 15px;
+margin-bottom: 40px;
+margin-top: 10px;
+}
 
-        .display-label {
-            position: absolute;
-            top: 10px;
-            left: 15px;
-            font-size: 14px;
-            color: #333333;
-            font-weight: bold;
-        }
+.device-header h1 {
+font-size: 32px;
+font-weight: bold;
+letter-spacing: 3px;
+text-align: center;
+}
 
-        .large-display {
-            font-size: 72px;
-            color: #000000;
-            margin: 20px 0 10px;
-        }
+/* コンテンツのレイアウト */
+.device-body {
+display: flex;
+flex-direction: column;
+gap: 40px;
+}
 
-        .unit {
-            font-size: 16px;
-            color: #666666;
-            font-weight: bold;
-        }
+/* STREAMING_CHUNK: 入出力パネルとコントロール枠の設定... /
+/ 各パネルを仕様書のセクション風に */
+.input-panel, .output-panel {
+width: 100%;
+display: flex;
+flex-direction: column;
+gap: 30px;
+}
 
-        /* LEDランプの表示エリア */
-        .alert-system {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #ffffff;
-            padding: 15px 20px;
-            border-radius: 8px;
-            border: 1px solid #cccccc;
-        }
+/* セクションの枠（仕様書の罫線風） */
+.control-group {
+border: 1px solid var(--ink-border);
+padding: 20px 25px;
+background-color: transparent;
+position: relative;
+}
 
-        .status-message {
-            font-size: 18px;
-            font-weight: bold;
-        }
+/* 枠の見出し（凡例風） */
+.control-group::before {
+position: absolute;
+top: -12px;
+left: 15px;
+background-color: var(--paper-bg);
+padding: 0 10px;
+font-size: 14px;
+font-weight: bold;
+color: var(--ink-main);
+}
+.input-panel .control-group:nth-child(1)::before {
+content: '【1】 温度パラメータ設定';
+}
+.input-panel .control-group:nth-child(2)::before {
+content: '【2】 湿度パラメータ設定';
+}
 
-        .led-array {
-            display: flex;
-            gap: 15px;
-            background-color: #e2e8f0;
-            padding: 10px 15px;
-            border-radius: 25px;
-        }
+/* STREAMING_CHUNK: デジタルフォントとボタングループのスタイリング... */
+.control-group label {
+display: flex;
+justify-content: space-between;
+align-items: center;
+font-size: 16px;
+font-weight: bold;
+margin-bottom: 15px;
+border-bottom: 1px dotted var(--ink-light);
+padding-bottom: 8px;
+}
 
-        /* LEDの基本形状（消灯時） */
-        .led {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background-color: #94a3b8;
-            border: 2px solid #cbd5e1;
-            transition: all 0.2s;
-        }
+/* デジタルフォントの適用 */
+.digital-text {
+font-family: 'Orbitron', monospace;
+font-weight: 700;
+letter-spacing: 2px;
+}
 
-        /* JavaScriptで 'on' クラスが付いた時の点灯状態 */
-        .led.green.on { background-color: #2ecc71; box-shadow: 0 0 15px #2ecc71; border-color: #27ae60; }
-        .led.yellow.on { background-color: #f1c40f; box-shadow: 0 0 15px #f1c40f; border-color: #f39c12; }
-        .led.red.on { background-color: #e74c3c; box-shadow: 0 0 15px #e74c3c; border-color: #c0392b; }
-    </style>
+/* ボタン群（印刷物風のシンプルな枠線） */
+.button-group {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 12px;
+}
+
+.button-group button {
+background-color: transparent;
+border: 1px solid var(--ink-light);
+color: var(--ink-main);
+padding: 10px;
+font-size: 14px;
+cursor: pointer;
+transition: all 0.1s;
+font-family: inherit;
+}
+
+.button-group button:hover {
+background-color: #f1f5f9;
+border-color: var(--ink-main);
+}
+.button-group button:active {
+background-color: var(--ink-main);
+color: var(--paper-bg);
+}
+
+/* STREAMING_CHUNK: 液晶ディスプレイ部分の装飾... /
+/ 液晶ディスプレイ風の画面 /
+.display-screen {
+background-color: var(--lcd-bg);
+border: 2px solid var(--ink-border);
+padding: 30px;
+text-align: center;
+position: relative;
+/ 液晶っぽい内側の影 */
+box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+.display-label {
+position: absolute;
+top: 10px;
+left: 15px;
+font-size: 13px;
+font-weight: bold;
+color: var(--lcd-text);
+border: 1px solid var(--lcd-text);
+padding: 2px 8px;
+}
+
+.large-display {
+font-size: 72px;
+color: var(--lcd-text);
+margin: 15px 0 5px 0;
+/* 液晶の文字が少し浮き出て見える影 */
+text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.unit {
+font-size: 16px;
+color: var(--lcd-text);
+text-align: right;
+margin-right: 15px;
+font-weight: bold;
+}
+
+/* STREAMING_CHUNK: 警告システムとLEDランプの光るエフェクト設定... /
+/ LED警告システム部分 */
+.alert-system {
+border: 2px dashed var(--ink-light);
+padding: 25px;
+text-align: center;
+background-color: #fafafa;
+}
+
+.alert-system::before {
+content: '▼ 判定結果出力 ▼';
+display: block;
+font-weight: bold;
+font-size: 14px;
+margin-bottom: 20px;
+color: var(--ink-light);
+}
+
+.status-message {
+font-size: 22px;
+font-weight: bold;
+margin-bottom: 25px;
+min-height: 33px;
+}
+
+/* LEDを配置する基板のようなデザイン */
+.led-array {
+display: flex;
+justify-content: center;
+gap: 50px;
+padding: 20px;
+border: 1px solid #ddd;
+background-color: #eeeeee;
+border-radius: 4px;
+box-shadow: inset 0 1px 4px rgba(0,0,0,0.1);
+}
+
+/* LEDの基本形状 */
+.led {
+width: 32px;
+height: 32px;
+border-radius: 50%;
+background-color: var(--led-off);
+border: 1px solid #999;
+box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+position: relative;
+transition: all 0.2s;
+}
+
+/* ガラスの反射ハイライト */
+.led::after {
+content: '';
+position: absolute;
+top: 15%;
+left: 20%;
+width: 30%;
+height: 30%;
+border-radius: 50%;
+background: rgba(255, 255, 255, 0.6);
+}
+
+/* LED点灯状態（JavaScriptで .on クラスが付与された時に光る） */
+.led.green.on {
+background-color: var(--led-green);
+box-shadow: 0 0 20px var(--led-green), inset 0 0 5px rgba(255,255,255,0.8);
+border-color: #16a34a;
+}
+.led.yellow.on {
+background-color: var(--led-yellow);
+box-shadow: 0 0 20px var(--led-yellow), inset 0 0 5px rgba(255,255,255,0.8);
+border-color: #ca8a04;
+}
+.led.red.on {
+background-color: var(--led-red);
+box-shadow: 0 0 20px var(--led-red), inset 0 0 5px rgba(255,255,255,0.8);
+border-color: #dc2626;
+}
